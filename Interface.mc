@@ -49,7 +49,7 @@ module Pinion
             }
             catch(e)
             {
-                System.println("Interface::initialize failed " + e);
+                System.println("Pinion: Interface::initialize failed " + e);
             }
         }
 
@@ -60,7 +60,7 @@ module Pinion
 
             if(_scanState == SCANNING)
             {
-                System.println("Timed out connecting, restarting scanning");
+                System.println("Pinion: Timed out connecting, restarting scanning");
                 Ble.setScanState(Ble.SCAN_STATE_SCANNING);
             }
             else if(_delegate != null)
@@ -75,13 +75,13 @@ module Pinion
 
             if(_connectedDevice != null)
             {
-                System.println("Already connected to a device");
+                System.println("Pinion: Already connected to a device");
                 return false;
             }
 
             if(deviceHandle.scanResult() == null)
             {
-                 System.println("DeviceHandle ScanResult is null");
+                 System.println("Pinion: DeviceHandle ScanResult is null");
                 return false;
             }
 
@@ -90,7 +90,7 @@ module Pinion
                 _connectedDevice = Ble.pairDevice(deviceHandle.scanResult() as Ble.ScanResult);
                 if(_connectedDevice == null)
                 {
-                    System.println("Ble.pairDevice returned null");
+                    System.println("Pinion: Ble.pairDevice returned null");
                     return false;
                 }
             }
@@ -98,7 +98,7 @@ module Pinion
             {
                 // This seems to happen sometimes when unpairDevice has definitely been called -- for whatever
                 // reason it seems to need some time to elapse before a call to pairDevice is allowed again
-                System.println("Ble.DevicePairException exception " + e.getErrorMessage());
+                System.println("Pinion: Ble.DevicePairException exception " + e.getErrorMessage());
                 return false;
             }
 
@@ -411,7 +411,7 @@ module Pinion
         {
             if(_connectedDevice == null)
             {
-                System.println("Can't getActiveErrors when not connected");
+                System.println("Pinion: Can't getActiveErrors when not connected");
                 return;
             }
 
@@ -424,14 +424,14 @@ module Pinion
         {
             if(status != Ble.STATUS_SUCCESS)
             {
-                System.println("Error writing to characteristic");
+                System.println("Pinion: Error writing to characteristic");
                 disconnect();
                 return;
             }
 
             if(_currentRequest == null)
             {
-                System.println("onCharacteristicWrite with no active request");
+                System.println("Pinion: onCharacteristicWrite with no active request");
                 disconnect();
                 return;
             }
@@ -449,14 +449,14 @@ module Pinion
         {
             if(status != Ble.STATUS_SUCCESS)
             {
-                System.println("Error writing to descriptor");
+                System.println("Pinion: Error writing to descriptor");
                 disconnect();
                 return;
             }
 
             if(_currentRequest == null)
             {
-                System.println("onDescriptorWrite with no active request");
+                System.println("Pinion: onDescriptorWrite with no active request");
                 disconnect();
                 return;
             }
@@ -466,7 +466,7 @@ module Pinion
 
             if(!success)
             {
-                System.println("Request onDescriptorWrite failed");
+                System.println("Pinion: Request onDescriptorWrite failed");
                 disconnect();
                 return;
             }
@@ -482,7 +482,7 @@ module Pinion
             {
                 if(_currentRequest == null)
                 {
-                    System.println("Response characteristic changed with no active request");
+                    System.println("Pinion: Response characteristic changed with no active request");
                     disconnect();
                     return;
                 }
@@ -558,7 +558,7 @@ module Pinion
             var success = _currentRequest.execute();
             if(!success)
             {
-                System.println("Request execution failed");
+                System.println("Pinion: Request execution failed");
                 disconnect();
             }
         }
@@ -634,14 +634,14 @@ module Pinion
             {
                 if(!parameter.equals(SERIAL_NUMBER))
                 {
-                    System.println("Parameter returned while scanning is not SERIAL_NUMBER: " + parameter);
+                    System.println("Pinion: Parameter returned while scanning is not SERIAL_NUMBER: " + parameter);
                     disconnect();
                     return;
                 }
 
                 if(_lastScanResult == null)
                 {
-                    System.println("Last scan result is null");
+                    System.println("Pinion: Last scan result is null");
                     disconnect();
                     return;
                 }
