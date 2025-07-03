@@ -27,6 +27,7 @@ module Pinion
         private var _foundDevices as Lang.Array<DeviceHandle> = new Lang.Array<DeviceHandle>[0];
 
         private var _connectedDevice as Ble.Device?;
+        private var _deviceIsPaired as Lang.Boolean = false;
         private var _currentGearCharacteristic as Ble.Characteristic?;
         private var _requestCharacteristic as Ble.Characteristic?;
         private var _responseCharacteristic as Ble.Characteristic?;
@@ -53,9 +54,18 @@ module Pinion
             }
         }
 
+        private function unpair() as Void
+        {
+            if(_connectedDevice != null && _deviceIsPaired)
+            {
+                Ble.unpairDevice(_connectedDevice as Ble.Device);
+                _deviceIsPaired = false;
+            }
+        }
+
         public function onConnectionTimeout() as Void
         {
-            Ble.unpairDevice(_connectedDevice as Ble.Device);
+            unpair();
             _connectedDevice = null;
 
             if(_scanState == SCANNING)
@@ -88,6 +98,7 @@ module Pinion
             try
             {
                 _connectedDevice = Ble.pairDevice(deviceHandle.scanResult() as Ble.ScanResult);
+                _deviceIsPaired = true;
                 if(_connectedDevice == null)
                 {
                     System.println("Pinion: Ble.pairDevice returned null");
@@ -157,7 +168,7 @@ module Pinion
 
             if(_connectedDevice != null)
             {
-                Ble.unpairDevice(_connectedDevice as Ble.Device);
+                unpair();
 
                 // For some reason, presumably a bug, onConnectedStateChanged is not called when you deliberately
                 // unpair a device, meaning there is no way of reacting to a disconnect, so instead we resort to
@@ -319,6 +330,7 @@ module Pinion
                     try
                     {
                         _connectedDevice = Ble.pairDevice(result);
+                        _deviceIsPaired = true;
                     }
                     catch(e instanceof Ble.DevicePairException)
                     {
@@ -594,11 +606,8 @@ module Pinion
 
         public function onDisconnected() as Void
         {
-            if(_connectedDevice != null)
-            {
-                // A spontaneous disconnection may result in being left in a paired state; we don't want this
-                Ble.unpairDevice(_connectedDevice as Ble.Device);
-            }
+            // A spontaneous disconnection may result in being left in a paired state; we don't want this
+            unpair();
 
             _currentGearCharacteristic = null;
             _requestCharacteristic = null;
