@@ -29,15 +29,6 @@ module Pinion
             FIRMWARE_VERSION =>         17563904,
             BOOTLOADER_VERSION =>       33620736,
             SERIAL_NUMBER =>            2480021234l,
-            MOUNTING_ANGLE =>           0,
-            REAR_TEETH =>               30,
-            FRONT_TEETH =>              30,
-            WHEEL_CIRCUMFERENCE =>      2231,
-            POWER_SUPPLY =>             1,
-            CAN_BUS =>                  0,
-            DISPLAY =>                  0,
-            SPEED_SENSOR_TYPE =>        1,
-            NUMBER_OF_MAGNETS =>        1,
             REVERSE_TRIGGER_MAPPING =>  1,
             CURRENT_GEAR =>             1,
             BATTERY_LEVEL =>            7654,
@@ -191,18 +182,6 @@ module Pinion
             _timer.start(method(:_simulateWrites), READWRITE_DELAY, false);
         }
 
-        public function blockRead(parameter as ParameterType) as Void
-        {
-            onBlockRead([0, 1, 2]b, 3, 9);
-            onBlockRead([3, 4, 5]b, 6, 9);
-            onBlockRead([6, 7, 8]b, 9, 9);
-        }
-
-        function getActiveErrors() as Void
-        {
-            onActiveErrorsRetrieved([1234]);
-        }
-
         public function setDelegate(delegate as Delegate) as Void
         {
             _delegate = delegate;
@@ -262,31 +241,9 @@ module Pinion
 
         public function onParameterWrite(parameter as ParameterType, value as Lang.Number) as Void
         {
-            if(parameter == HIDDEN_SETTINGS_ENABLE)
-            {
-                // No point in notifying this
-                return;
-            }
-
             if(_delegate != null)
             {
                 (_delegate as Delegate).onParameterWrite(parameter, value);
-            }
-        }
-
-        public function onBlockRead(bytes as Lang.ByteArray, cumulative as Lang.Number, total as Lang.Number) as Void
-        {
-            if(_delegate != null)
-            {
-                (_delegate as Delegate).onBlockRead(bytes, cumulative, total);
-            }
-        }
-
-        public function onActiveErrorsRetrieved(activeErrors as Lang.Array<Lang.Number>) as Void
-        {
-            if(_delegate != null)
-            {
-                (_delegate as Delegate).onActiveErrorsRetrieved(activeErrors);
             }
         }
     }
